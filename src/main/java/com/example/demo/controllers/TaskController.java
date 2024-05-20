@@ -1,11 +1,13 @@
 package com.example.demo.controllers;
 
 import java.net.URI;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -50,5 +52,10 @@ public class TaskController {
 	public ResponseEntity<Void> delete(@PathVariable Long id){
 		this.taskService.delete(id);
 		return ResponseEntity.noContent().build();
+	}
+	@GetMapping("/usuario/{id}")
+	public ResponseEntity<List<Task>> findAllByUserioId(@PathVariable Long userId){
+		List<Task> objs = this.taskService.findAllByUserId(userId);
+		return ResponseEntity.ok().body(objs);
 	}
 }
