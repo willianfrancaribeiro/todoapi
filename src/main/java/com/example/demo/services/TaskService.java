@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.example.demo.model.Task;
 import com.example.demo.model.User;
 import com.example.demo.repositories.TaskRepository;
+import com.example.demo.services.exceptions.DataBindingViolationException;
 
 import jakarta.transaction.Transactional;
 
@@ -49,7 +50,7 @@ public class TaskService {
 		try {
 			this.taskRepository.deleteById(id);
 		}catch(Exception e) {
-			throw new RuntimeException("Não foi possivel deletar a task");
+			throw new DataBindingViolationException("Não é possível excluir pois há entidades relacionadas!");
 		}
 	}
 }
