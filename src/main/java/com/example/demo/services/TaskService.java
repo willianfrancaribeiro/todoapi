@@ -1,6 +1,7 @@
 package com.example.demo.services;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +9,10 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.model.Task;
 import com.example.demo.model.User;
+import com.example.demo.model.enums.ProfileEnum;
 import com.example.demo.repositories.TaskRepository;
+import com.example.demo.security.UserSpringSecurity;
+import com.example.demo.services.exceptions.AuthorizationException;
 import com.example.demo.services.exceptions.DataBindingViolationException;
 
 import jakarta.transaction.Transactional;
@@ -21,8 +25,18 @@ public class TaskService {
 	private UserService userService;
 	
 	public Task findById(Long id) {
-		Optional<Task> task = this.taskRepository.findById(id);
-		return task.orElseThrow(()->new RuntimeException("Tarefa não encontrada"));
+		Task task = this.taskRepository.findById(id)
+				.orElseThrow(()->new RuntimeException(
+				"Tarefa não encontrada"));
+		
+		UserSpringSecurity userSpringSecurity = UserService.authenticated();
+		
+		if(Objects.isNull(userSpringSecurity) 
+				|| !userSpringSecurity.hasRole(ProfileEnum.ADMIN)
+				&& !userHasTask(userSpringSecurity,task))
+			throw new AuthorizationException("Acesso negado");
+		
+		return task;
 	}
 	
 	public List<Task> findAllByUserId(Long userId){
@@ -53,4 +67,9 @@ public class TaskService {
 			throw new DataBindingViolationException("Não é possível excluir pois há entidades relacionadas!");
 		}
 	}
+	private Boolean userHasTask(UserSpringSecurity userSpringSecurity,Task task) {
+		return task.getUsuario().getId().equals(userSpringSecurity.getId());
+	}
+	
+	
 }

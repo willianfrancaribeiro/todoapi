@@ -28,9 +28,16 @@ public class TaskController {
 	@Autowired
 	private TaskService taskService;
 	
+	@GetMapping("/{id}")
 	public ResponseEntity<Task> findById(@PathVariable Long id){
 		Task obj = this.taskService.findById(id);
 		return ResponseEntity.ok(obj);
+	}
+	
+	@GetMapping("/usuario")
+	public ResponseEntity<List<Task>> findAllByUserioId(@PathVariable Long userId){
+		List<Task> objs = this.taskService.findAllByUserId(userId);
+		return ResponseEntity.ok().body(objs);
 	}
 	
 	@PostMapping
@@ -53,9 +60,5 @@ public class TaskController {
 		this.taskService.delete(id);
 		return ResponseEntity.noContent().build();
 	}
-	@GetMapping("/usuario/{id}")
-	public ResponseEntity<List<Task>> findAllByUserioId(@PathVariable Long userId){
-		List<Task> objs = this.taskService.findAllByUserId(userId);
-		return ResponseEntity.ok().body(objs);
-	}
+	
 }
